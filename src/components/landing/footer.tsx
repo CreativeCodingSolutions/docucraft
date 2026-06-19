@@ -7,12 +7,28 @@ export function Footer() {
         </p>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <a
-            href="https://github.com/anomalyco/docucraft"
+            href="https://github.com/CreativeCodingSolutions/docucraft"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-foreground transition-colors"
           >
             GitHub
+          </a>
+          <a
+            href="https://creativecodingsolutions.github.io/docucraft"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-foreground transition-colors"
+          >
+            Docs
+          </a>
+          <a
+            href="https://github.com/marketplace/actions/docucraft-pr-description-generator"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-foreground transition-colors"
+          >
+            Marketplace
           </a>
         </div>
       </div>

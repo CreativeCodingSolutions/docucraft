@@ -15,10 +15,10 @@ export function Hero() {
         </p>
         <div className="mt-10 flex items-center justify-center gap-4">
           <Link
-            href="/api/github/auth"
+            href="https://github.com/marketplace/actions/docucraft-pr-description-generator"
             className="inline-flex h-12 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            Install GitHub App
+            Add to GitHub
           </Link>
           <Link
             href="/#features"

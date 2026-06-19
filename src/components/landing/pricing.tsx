@@ -100,7 +100,7 @@ export function Pricing() {
                 ))}
               </ul>
               <Link
-                href="/api/github/auth"
+                href="https://github.com/marketplace/actions/docucraft-pr-description-generator"
                 className={`mt-8 flex h-10 w-full items-center justify-center rounded-md text-sm font-medium transition-colors ${
                   plan.popular
                     ? "bg-primary text-primary-foreground hover:bg-primary/90"
