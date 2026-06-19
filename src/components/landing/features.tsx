@@ -5,14 +5,14 @@ const features = [
       "Every pull request gets a clear, well-structured description generated from your code changes. No more 'fixed stuff' PRs.",
   },
   {
-    title: "Changelog Generation",
+    title: "Template Mode (Free)",
     description:
-      "Generate release notes from merged PRs with one click. Grouped by category, ready to publish.",
+      "Works out of the box with zero API keys, zero cost, zero config. Generates structured descriptions from your git diff.",
   },
   {
     title: "GitHub Native",
     description:
-      "Works as a GitHub App. Install on your repos and it just works. No configuration files, no CI pipeline changes.",
+      "Works as a GitHub Action. Add one YAML workflow file and it just works. No servers, no database, no signup.",
   },
   {
     title: "Smart Analysis",
@@ -27,7 +27,7 @@ const features = [
   {
     title: "Open Source",
     description:
-      "Free for public repositories. Pay only for private repos and advanced features.",
+      "MIT licensed. Free for public and private repositories. No usage limits, no hidden costs.",
   },
 ];
 

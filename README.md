@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: CreativeCodingSolutions/docucraft/.github/actions/docucraft@v1
+      - uses: CreativeCodingSolutions/docucraft@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -42,7 +42,7 @@ That's it. Every PR will get a generated description.
 Add your OpenAI API key as a repository secret and enable AI mode:
 
 ```yaml
-- uses: CreativeCodingSolutions/docucraft/.github/actions/docucraft@v1
+- uses: CreativeCodingSolutions/docucraft@v1
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     mode: ai

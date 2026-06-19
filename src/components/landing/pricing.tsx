@@ -8,7 +8,7 @@ const plans = [
     features: [
       "Public repositories only",
       "Auto PR descriptions",
-      "Changelog generation",
+      "Template & AI modes",
       "Community support",
     ],
   },
@@ -20,7 +20,7 @@ const plans = [
     features: [
       "Unlimited public & private repos",
       "Auto PR descriptions",
-      "Changelog generation",
+      "Template & AI modes",
       "Priority support",
       "Custom AI model settings",
     ],
@@ -100,7 +100,7 @@ export function Pricing() {
                 ))}
               </ul>
               <Link
-                href="https://github.com/marketplace/actions/docucraft-pr-description-generator"
+                href="https://github.com/CreativeCodingSolutions/docucraft"
                 className={`mt-8 flex h-10 w-full items-center justify-center rounded-md text-sm font-medium transition-colors ${
                   plan.popular
                     ? "bg-primary text-primary-foreground hover:bg-primary/90"

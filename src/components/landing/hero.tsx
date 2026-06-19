@@ -15,7 +15,7 @@ export function Hero() {
         </p>
         <div className="mt-10 flex items-center justify-center gap-4">
           <Link
-            href="https://github.com/marketplace/actions/docucraft-pr-description-generator"
+            href="https://github.com/CreativeCodingSolutions/docucraft"
             className="inline-flex h-12 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             Add to GitHub

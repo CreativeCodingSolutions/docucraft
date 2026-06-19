@@ -1,8 +1,8 @@
 name: "DocuCraft — PR Description Generator"
-description: "Automatically generates structured PR descriptions from pull request diffs."
+description: "Automatically generates structured PR descriptions from pull request diffs. Zero config, no API keys needed for basic mode."
 author: "DocuCraft"
 branding:
-  icon: "file-text"
+  icon: "git-pull-request"
   color: "blue"
 
 inputs:
