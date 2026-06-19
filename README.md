@@ -1,67 +1,77 @@
-# DocuCraft — AI Documentation from Your GitHub Repos
+# DocuCraft — Auto PR Descriptions
 
-DocuCraft automatically generates PR descriptions, changelogs, and documentation from your GitHub repositories.
+DocuCraft automatically generates structured PR descriptions from your pull request diffs. Works as a **GitHub Action** — no servers, no database, no configuration needed.
 
-## Phase 0: PR Pilot
+## Usage
 
-The initial release ("PR Pilot") focuses on two core features:
-- **Auto PR Descriptions** — Every pull request gets a clear, well-structured description generated from code changes
-- **Changelog Generation** — Generate release notes from merged PRs with one click
+Add this to `.github/workflows/docucraft.yml`:
 
-## Tech Stack
+```yaml
+name: DocuCraft
 
-- **Frontend:** Next.js 16, React 19, Tailwind CSS v4, shadcn/ui
-- **Backend:** Next.js API routes (serverless)
-- **Database:** Supabase (Postgres)
-- **AI:** OpenAI (GPT-4o-mini)
-- **Auth:** GitHub App OAuth
-- **Deployment:** Vercel (frontend + API), Railway (background tasks), Supabase (DB)
+on:
+  pull_request:
+    types: [opened, synchronize]
 
-## Getting Started
+permissions:
+  contents: read
+  pull-requests: write
 
-```bash
-# Copy environment variables
-cp .env.example .env.local
-
-# Fill in your credentials:
-# - Supabase project URL and keys
-# - GitHub App credentials
-# - OpenAI API key
-
-# Run development server
-npm run dev
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: CreativeCodingSolutions/docucraft/.github/actions/docucraft@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## Environment Variables
+That's it. Every PR will get a generated description.
 
-| Variable | Description |
-|----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key |
-| `GITHUB_APP_ID` | GitHub App ID |
-| `GITHUB_APP_CLIENT_ID` | GitHub App client ID |
-| `GITHUB_APP_CLIENT_SECRET` | GitHub App client secret |
-| `GITHUB_APP_PRIVATE_KEY` | GitHub App private key |
-| `GITHUB_APP_WEBHOOK_SECRET` | GitHub App webhook secret |
-| `OPENAI_API_KEY` | OpenAI API key |
-| `OPENAI_MODEL` | OpenAI model (default: gpt-4o-mini) |
-| `NEXT_PUBLIC_APP_URL` | App URL (http://localhost:3000 for dev) |
+## Features
 
-## Architecture
+- **Zero config** — add the workflow file, done
+- **No API keys** — works out of the box with template mode
+- **AI mode** — optional OpenAI integration for smarter descriptions
+- **Works on every PR** — open, synchronize, reopened
+- **No servers** — runs entirely in GitHub Actions
 
-1. **GitHub App** receives `pull_request` webhook events
-2. **Webhook handler** fetches PR diff, generates AI description via OpenAI
-3. **AI description** posted as PR comment and stored in Supabase
-4. **Dashboard** displays repos, PRs, and generated changelogs
-5. **Changelog generation** groups merged PRs and generates release notes
+## AI Mode (Optional)
 
-## Pricing
+Add your OpenAI API key as a repository secret and enable AI mode:
 
-- **Free** — Open source repos
-- **$29/mo Pro** — Individual developers, private repos
-- **$79/mo Team** — Small teams, multiple installations
+```yaml
+- uses: CreativeCodingSolutions/docucraft/.github/actions/docucraft@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    mode: ai
+    openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+```
 
-## License
+## Inputs
 
-MIT
+| Input | Required | Default | Description |
+|-------|----------|---------|-------------|
+| `github-token` | Yes | — | `secrets.GITHUB_TOKEN` |
+| `openai-api-key` | No | — | OpenAI API key for AI mode |
+| `openai-model` | No | `gpt-4o-mini` | OpenAI model name |
+| `mode` | No | `template` | `template` or `ai` |
+| `update-title` | No | `false` | Update PR title too |
+
+## Outputs
+
+| Output | Description |
+|--------|-------------|
+| `description` | The generated PR description text |
+
+## Why DocuCraft?
+
+- Stop writing "fixed stuff" PR descriptions
+- Consistent documentation across your team
+- Works on public AND private repos
+- Free and open source
+
+## Website
+
+https://creativecodingsolutions.github.io/docucraft/
