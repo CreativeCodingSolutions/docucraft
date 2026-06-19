@@ -3,15 +3,25 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getPRDiff, getPRFiles, postPRComment } from "@/lib/github/api";
 import { getInstallationToken } from "@/lib/github/token";
 import { generatePRDescription } from "@/lib/ai/generate";
+import { verifyWebhookSignature } from "@/lib/github/webhook";
 
 export async function POST(request: NextRequest) {
-  const payload = await request.json();
+  const payloadText = await request.text();
+  const payload = JSON.parse(payloadText);
 
   const event = request.headers.get("x-github-event");
   const deliveryId = request.headers.get("x-github-delivery");
+  const signature = request.headers.get("x-hub-signature-256");
 
   if (!event || !deliveryId) {
     return NextResponse.json({ error: "Missing headers" }, { status: 400 });
+  }
+
+  const webhookSecret = process.env.GITHUB_APP_WEBHOOK_SECRET;
+  if (webhookSecret && signature) {
+    if (!verifyWebhookSignature(payloadText, signature, webhookSecret)) {
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+    }
   }
 
   if (event !== "pull_request") {

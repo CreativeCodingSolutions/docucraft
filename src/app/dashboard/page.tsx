@@ -39,13 +39,18 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    if (!selectedRepo) return;
+    const repoId = selectedRepo;
+    if (!repoId) return;
 
     async function loadPRs() {
       try {
-        const res = await fetch(`/api/prs?repo_id=${selectedRepo}`);
+        const res = await fetch(`/api/prs?repo_id=${repoId}`);
         const data = await res.json();
-        setPrs((prev) => ({ ...prev, [selectedRepo]: data.prs || [] }));
+        setPrs((prev) => {
+          const next = { ...prev };
+          next[repoId as number] = data.prs || [];
+          return next;
+        });
       } catch (error) {
         console.error("Failed to load PRs:", error);
       }

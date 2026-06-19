@@ -19,20 +19,21 @@ const ThemeProviderContext = React.createContext<ThemeProviderState | undefined>
   undefined
 );
 
+function getInitialTheme(storageKey: string, defaultTheme: Theme): Theme {
+  if (typeof window === "undefined") return defaultTheme;
+  const stored = localStorage.getItem(storageKey) as Theme | null;
+  return stored || defaultTheme;
+}
+
 export function ThemeProvider({
   children,
   defaultTheme = "system",
   storageKey = "docucraft-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = React.useState<Theme>(defaultTheme);
-
-  React.useEffect(() => {
-    const stored = localStorage.getItem(storageKey) as Theme | null;
-    if (stored) {
-      setTheme(stored);
-    }
-  }, [storageKey]);
+  const [theme, setTheme] = React.useState<Theme>(
+    getInitialTheme(storageKey, defaultTheme)
+  );
 
   React.useEffect(() => {
     const root = document.documentElement;
@@ -47,6 +48,19 @@ export function ThemeProvider({
     } else {
       root.classList.add(theme);
     }
+  }, [theme]);
+
+  React.useEffect(() => {
+    const onSystemChange = (e: MediaQueryListEvent) => {
+      if (theme === "system") {
+        root.classList.remove("light", "dark");
+        root.classList.add(e.matches ? "dark" : "light");
+      }
+    };
+    const root = document.documentElement;
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    mq.addEventListener("change", onSystemChange);
+    return () => mq.removeEventListener("change", onSystemChange);
   }, [theme]);
 
   const value = React.useMemo(
