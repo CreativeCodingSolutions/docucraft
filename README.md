@@ -58,12 +58,21 @@ Add your OpenAI API key as a repository secret and enable AI mode:
 | `openai-model` | No | `gpt-4o-mini` | OpenAI model name |
 | `mode` | No | `template` | `template` or `ai` |
 | `update-title` | No | `false` | Update PR title too |
+| `template-style` | No | `standard` | `standard`, `detailed`, or `minimal` |
 
 ## Outputs
 
 | Output | Description |
 |--------|-------------|
 | `description` | The generated PR description text |
+
+### Template Styles
+
+**Standard** (default): Categorizes files into Source Code, Configuration, Tests, Documentation, and Assets. Generates a summary with file count and change categories.
+
+**Detailed**: Everything in standard, plus a diff preview section showing the first 3000 characters of the diff.
+
+**Minimal**: Simple file list with summary — no categorization, no diff preview. Best for small PRs.
 
 ## Why DocuCraft?
 

@@ -24,6 +24,10 @@ inputs:
     description: "Whether to update the PR title with a generated one (true/false)"
     required: false
     default: "false"
+  template-style:
+    description: "Template style: standard (default), detailed, or minimal"
+    required: false
+    default: "standard"
 
 outputs:
   description:
@@ -60,6 +64,75 @@ runs:
         fi
         echo "diff_size=$DIFF_SIZE" >> $GITHUB_OUTPUT
         gh pr view $PR_NUMBER --json files --jq '.files[].path' > /tmp/pr_files.txt 2>&1 || true
+        gh pr view $PR_NUMBER --json files --jq '[.files[] | {path: .path, status: .status, additions: .additions, deletions: .deletions}]' > /tmp/pr_files_detail.json 2>&1 || true
+
+    - name: Analyze changes
+      id: analyze
+      shell: bash
+      run: |
+        FILES_JSON=$(cat /tmp/pr_files_detail.json 2>/dev/null || echo "[]")
+
+        # Categorize files
+        SOURCE_FILES=""
+        CONFIG_FILES=""
+        TEST_FILES=""
+        DOCS_FILES=""
+        ASSET_FILES=""
+        UNKNOWN_FILES=""
+        TOTAL_ADDITIONS=0
+        TOTAL_DELETIONS=0
+
+        while IFS= read -r file; do
+          [ -z "$file" ] && continue
+          FILENAME=$(basename "$file")
+          EXT="${FILENAME##*.}"
+
+          case "$EXT" in
+            ts|tsx|js|jsx|py|rs|go|java|rb|php|c|cpp|h|hpp|swift|kt|scala)
+              if [[ "$file" =~ test|spec|__tests__ ]]; then
+                TEST_FILES="$TEST_FILES- $file"$'\n'
+              else
+                SOURCE_FILES="$SOURCE_FILES- $file"$'\n'
+              fi
+              ;;
+            json|yaml|yml|toml|ini|cfg|env|conf)
+              CONFIG_FILES="$CONFIG_FILES- $file"$'\n'
+              ;;
+            md|rst|txt|adoc|wiki)
+              DOCS_FILES="$DOCS_FILES- $file"$'\n'
+              ;;
+            svg|png|jpg|jpeg|gif|ico|woff|woff2|ttf|eot|css|scss|less)
+              ASSET_FILES="$ASSET_FILES- $file"$'\n'
+              ;;
+            *)
+              UNKNOWN_FILES="$UNKNOWN_FILES- $file"$'\n'
+              ;;
+          esac
+        done < /tmp/pr_files.txt
+
+        echo "source_files<<EOF" >> $GITHUB_OUTPUT
+        echo "${SOURCE_FILES:-None}" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+        echo "config_files<<EOF" >> $GITHUB_OUTPUT
+        echo "${CONFIG_FILES:-None}" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+        echo "test_files<<EOF" >> $GITHUB_OUTPUT
+        echo "${TEST_FILES:-None}" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+        echo "docs_files<<EOF" >> $GITHUB_OUTPUT
+        echo "${DOCS_FILES:-None}" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+        echo "asset_files<<EOF" >> $GITHUB_OUTPUT
+        echo "${ASSET_FILES:-None}" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+        echo "other_files<<EOF" >> $GITHUB_OUTPUT
+        echo "${UNKNOWN_FILES:-None}" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
 
     - name: Generate description (template mode)
       id: generate
@@ -70,29 +143,132 @@ runs:
       run: |
         PR_NUMBER="${{ steps.diff.outputs.pr_number }}"
         PR_TITLE="${{ steps.diff.outputs.title }}"
+        STYLE="${{ inputs.template-style }}"
 
-        FILES_LIST=""
-        while IFS= read -r file; do
-          FILES_LIST="$FILES_LIST- $file"$'\n'
-        done < /tmp/pr_files.txt
+        SOURCE="${{ steps.analyze.outputs.source_files }}"
+        CONFIG="${{ steps.analyze.outputs.config_files }}"
+        TESTS="${{ steps.analyze.outputs.test_files }}"
+        DOCS="${{ steps.analyze.outputs.docs_files }}"
+        ASSETS="${{ steps.analyze.outputs.asset_files }}"
+        OTHER="${{ steps.analyze.outputs.other_files }}"
 
-        DIFF_PREVIEW=""
-        if [ -f /tmp/pr_diff.txt ]; then
-          DIFF_PREVIEW=$(head -c 2000 /tmp/pr_diff.txt)
+        HAS_SOURCE=false; HAS_CONFIG=false; HAS_TESTS=false; HAS_DOCS=false; HAS_ASSETS=false; HAS_OTHER=false
+        [ "$SOURCE" != "None" ] && HAS_SOURCE=true
+        [ "$CONFIG" != "None" ] && HAS_CONFIG=true
+        [ "$TESTS" != "None" ] && HAS_TESTS=true
+        [ "$DOCS" != "None" ] && HAS_DOCS=true
+        [ "$ASSETS" != "None" ] && HAS_ASSETS=true
+        [ "$OTHER" != "None" ] && HAS_OTHER=true
+
+        FIRST_FILE=$(head -1 /tmp/pr_files.txt 2>/dev/null || echo "")
+        FILE_COUNT=$(wc -l < /tmp/pr_files.txt 2>/dev/null || echo 0)
+
+        if [ "$FILE_COUNT" -le 1 ] && [ -z "$FIRST_FILE" ]; then
+          FILE_COUNT=0
         fi
 
-        DESCRIPTION=$(cat <<DESC_EOF
+        SUMMARY="This pull request modifies $FILE_COUNT file"
+        [ "$FILE_COUNT" -ne 1 ] && SUMMARY="$SUMMARY"s
+        SUMMARY="$SUMMARY."
+        if $HAS_SOURCE; then
+          SUMMARY="$SUMMARY Includes source code changes."
+        fi
+        if $HAS_TESTS; then
+          SUMMARY="$SUMMARY Includes test updates."
+        fi
+        if $HAS_CONFIG; then
+          SUMMARY="$SUMMARY Includes configuration changes."
+        fi
+
+        CHANGES_SECTION=""
+        if $HAS_SOURCE; then
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'"### Source Code"
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'""
+          CHANGES_SECTION="${CHANGES_SECTION}${SOURCE}"
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'
+        fi
+        if $HAS_CONFIG; then
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'"### Configuration"
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'""
+          CHANGES_SECTION="${CHANGES_SECTION}${CONFIG}"
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'
+        fi
+        if $HAS_TESTS; then
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'"### Tests"
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'""
+          CHANGES_SECTION="${CHANGES_SECTION}${TESTS}"
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'
+        fi
+        if $HAS_DOCS; then
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'"### Documentation"
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'""
+          CHANGES_SECTION="${CHANGES_SECTION}${DOCS}"
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'
+        fi
+        if $HAS_ASSETS; then
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'"### Assets"
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'""
+          CHANGES_SECTION="${CHANGES_SECTION}${ASSETS}"
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'
+        fi
+        if $HAS_OTHER; then
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'"### Other Changes"
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'""
+          CHANGES_SECTION="${CHANGES_SECTION}${OTHER}"
+          CHANGES_SECTION="${CHANGES_SECTION}"$'\n'
+        fi
+
+        if [ "$STYLE" = "minimal" ]; then
+          DESCRIPTION=$(cat <<DESC_EOF
 ## Summary
 
-<!-- Generated by DocuCraft -->
+$SUMMARY
 
-This pull request introduces changes to the following files:
+### Files Changed
 
-$FILES_LIST
+$(cat /tmp/pr_files.txt 2>/dev/null || echo "None")
 
-### Changes
+---
 
-- $(echo "$FILES_LIST" | head -5 | tr '\n' ' ' | sed 's/- //g' | awk '{print "Modified: "$0}')
+###### 🤖 Generated by [DocuCraft](https://github.com/${{ github.repository }})
+DESC_EOF
+)
+        elif [ "$STYLE" = "detailed" ]; then
+          DIFF_PREVIEW=""
+          if [ -f /tmp/pr_diff.txt ]; then
+            DIFF_PREVIEW=$(head -c 3000 /tmp/pr_diff.txt)
+          fi
+          DESCRIPTION=$(cat <<DESC_EOF
+## Summary
+
+$SUMMARY
+
+### Changes by Category
+$CHANGES_SECTION
+
+### Diff Preview
+
+\`\`\`diff
+$DIFF_PREVIEW
+\`\`\`
+
+### Why
+
+Automated pull request description generated by DocuCraft. See diff preview above for detailed changes.
+
+---
+
+###### 🤖 Generated by [DocuCraft](https://github.com/${{ github.repository }})
+DESC_EOF
+)
+        else
+          DESCRIPTION=$(cat <<DESC_EOF
+## Summary
+
+$SUMMARY
+
+### Changes by Category
+$CHANGES_SECTION
 
 ### Why
 
@@ -100,9 +276,11 @@ Automated pull request description generated by DocuCraft. Review the diff for d
 
 ---
 
-> 🤖 This description was automatically generated by [DocuCraft](https://github.com/${{ github.repository }}/actions).
+###### 🤖 Generated by [DocuCraft](https://github.com/${{ github.repository }})
 DESC_EOF
 )
+        fi
+
         echo "description<<EOF" >> $GITHUB_OUTPUT
         echo "$DESCRIPTION" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
