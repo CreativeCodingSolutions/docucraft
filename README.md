@@ -248,6 +248,12 @@ The changelog entry is available as the `changelog-entry` output. Use it in a su
 
 No signup, no API keys, no cost. It just works.
 
+## 🎬 See DocuCraft in Action
+
+DocuCraft wrote its own PR description on the very first test. View it live:
+
+👉 [**PR #4 — "Demo: DocuCraft auto-generating PR descriptions"**](https://github.com/CreativeCodingSolutions/docucraft/pull/4)
+
 ## 📊 Real-World Case Study
 
 We analyzed 100+ PRs across popular GitHub Actions repos and found ~15% had
