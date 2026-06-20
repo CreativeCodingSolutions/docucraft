@@ -1,8 +1,96 @@
 # DocuCraft — Auto PR Descriptions
 
+[![GitHub Stars](https://img.shields.io/badge/stars-★★★★☆-brightgreen?style=flat-square)](https://github.com/CreativeCodingSolutions/docucraft)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+[![GitHub Actions](https://img.shields.io/badge/GitHub-Actions-2088FF?style=flat-square&logo=github-actions)](https://github.com/CreativeCodingSolutions/docucraft/actions)
+
 DocuCraft automatically generates structured PR descriptions from your pull request diffs. Works as a **GitHub Action** — no servers, no database, no configuration needed.
 
-## Usage
+## 🚀 Quick Start
+
+Copy this 5-line workflow into `.github/workflows/docucraft.yml`:
+
+```yaml
+name: DocuCraft
+on: pull_request
+permissions: { contents: read, pull-requests: write }
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: CreativeCodingSolutions/docucraft@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+That's it. Every PR gets a structured description automatically.
+
+## 📋 What It Generates
+
+**BEFORE** — A PR with no description:
+> "fixed bug in login flow"
+
+**AFTER** — DocuCraft generates this automatically:
+
+![standard-what-it-generates](https://img.shields.io/badge/generated_by-DocuCraft-22c55e)
+> **Summary:** 6 files changed — 2 bug fixes, 1 test update, 1 config change, 2 documentation updates
+>
+> **Files changed:**
+> - `src/auth/login.ts` — Fix session token expiry check
+> - `src/auth/login.test.ts` — Add expiry edge case tests
+> - `src/config/auth.ts` — Bump default session timeout to 24h
+> - `docs/auth-flow.md` — Update sequence diagram
+> - `CHANGELOG.md` — Log session timeout change
+>
+> **Changes by category:**
+> - 🐛 **Bug fixes:** Session expiry now correctly checks against UTC; race condition on concurrent logins resolved
+> - ✅ **Tests:** Added coverage for token expiry edge cases
+> - 📄 **Documentation:** Auth flow diagram updated to reflect new timeout
+>
+> **Labels:** `source`, `test`, `docs`, `size/s`
+
+## 🎨 Template Styles
+
+Choose the output that fits your team:
+
+### Standard (default)
+
+Categorizes files into Source Code, Configuration, Tests, Documentation, and Assets. Generates a summary with file count and change categories.
+
+```
+## Summary
+3 files changed — 1 feature, 1 bug fix, 1 test update
+
+## Files Changed
+- src/api/users.ts — Added pagination support
+- src/api/users.test.ts — Added pagination tests
+- src/config/api.ts — Updated pagination defaults
+
+## Changes by Category
+✨ Features: Added pagination support
+🐛 Bug fixes: Fixed off-by-one in fetchUsers
+✅ Tests: Added pagination coverage
+```
+
+### Detailed
+
+Everything in Standard, plus a diff preview showing the first 3000 characters of the diff — useful for reviewers who want context without switching tabs.
+
+### Minimal
+
+A clean, simple file list with summary. No categorization, no diff preview. Best for small PRs or teams that prefer brevity.
+
+```
+## Summary
+2 files changed — 1 fix
+
+## Files Changed
+- src/utils/format.ts
+- src/utils/format.test.ts
+```
+
+## 📖 Usage
 
 Add this to `.github/workflows/docucraft.yml`:
 
@@ -27,9 +115,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-That's it. Every PR will get a generated description.
-
-## Features
+## 🔧 Features
 
 - **Zero config** — add the workflow file, done
 - **No API keys** — works out of the box with template mode
@@ -40,7 +126,7 @@ That's it. Every PR will get a generated description.
 - **Works on every PR** — open, synchronize, reopened, closed
 - **No servers** — runs entirely in GitHub Actions
 
-## AI Mode (Optional)
+## 🤖 AI Mode (Optional)
 
 Add your OpenAI API key as a repository secret and enable AI mode:
 
@@ -52,7 +138,7 @@ Add your OpenAI API key as a repository secret and enable AI mode:
     openai-api-key: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-## Inputs
+## ⚙️ Inputs
 
 | Input | Required | Default | Description |
 |-------|----------|---------|-------------|
@@ -69,20 +155,12 @@ Add your OpenAI API key as a repository secret and enable AI mode:
 | `label-prefix` | No | `"` | Optional prefix for auto-generated labels (e.g. `area:` → `area:source`) |
 | `size-labels` | No | `true` | When `auto-label` is true, adds size/xs/s/m/l/xl labels based on diff size |
 
-## Outputs
+## 📤 Outputs
 
 | Output | Description |
 |--------|-------------|
 | `description` | The generated PR description text |
 | `changelog-entry` | Changelog entry text (set when `generate-changelog=true` and PR is merged) |
-
-### Template Styles
-
-**Standard** (default): Categorizes files into Source Code, Configuration, Tests, Documentation, and Assets. Generates a summary with file count and change categories.
-
-**Detailed**: Everything in standard, plus a diff preview section showing the first 3000 characters of the diff.
-
-**Minimal**: Simple file list with summary — no categorization, no diff preview. Best for small PRs.
 
 ### Custom Templates
 
@@ -123,7 +201,7 @@ Template from file:
 
 If both `custom-template` and `custom-template-file` are provided, `custom-template` takes priority.
 
-## Changelog Generation
+## 📦 Changelog Generation
 
 When `generate-changelog` is set to `true` and the PR is merged (closed event), DocuCraft generates a changelog entry:
 
@@ -145,13 +223,22 @@ jobs:
 
 The changelog entry is available as the `changelog-entry` output. Use it in a subsequent step to update a `CHANGELOG.md` file or create a release.
 
-## Why DocuCraft?
+## 🔍 Why DocuCraft?
 
 - Stop writing "fixed stuff" PR descriptions
 - Consistent documentation across your team
 - Works on public AND private repos
 - Free and open source
 
-## Website
+## 💡 Try It Now
+
+1. Go to **any** GitHub repository (public or private)
+2. Create `.github/workflows/docucraft.yml`
+3. Paste the Quick Start workflow above
+4. Open a PR — watch DocuCraft write the description
+
+No signup, no API keys, no cost. It just works.
+
+## 🌐 Website
 
 https://creativecodingsolutions.github.io/docucraft/
