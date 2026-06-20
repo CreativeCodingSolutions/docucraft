@@ -1,12 +1,20 @@
 # DocuCraft — Auto PR Descriptions
 
-[![GitHub Stars](https://img.shields.io/badge/stars-★★★★☆-brightgreen?style=flat-square)](https://github.com/CreativeCodingSolutions/docucraft)
+[![GitHub Stars](https://img.shields.io/github/stars/CreativeCodingSolutions/docucraft?style=flat-square)](https://github.com/CreativeCodingSolutions/docucraft)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![GitHub Actions](https://img.shields.io/badge/GitHub-Actions-2088FF?style=flat-square&logo=github-actions)](https://github.com/CreativeCodingSolutions/docucraft/actions)
+[![Template](https://img.shields.io/badge/Use-template-2ea44f?style=flat-square&logo=github)](https://github.com/CreativeCodingSolutions/docucraft-demo)
+[![Contributing](https://img.shields.io/badge/contributions-welcome-brightgreen?style=flat-square)](CONTRIBUTING.md)
 
 DocuCraft automatically generates structured PR descriptions from your pull request diffs. Works as a **GitHub Action** — no servers, no database, no configuration needed.
 
 ## 🚀 Quick Start
+
+### Option 1: Use the Starter Template
+
+Click **[Use this template](https://github.com/CreativeCodingSolutions/docucraft-demo)** → create a repo → open a PR. DocuCraft runs automatically.
+
+### Option 2: Add to an Existing Repo
 
 Copy this workflow into `.github/workflows/docucraft.yml`:
 
