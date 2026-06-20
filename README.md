@@ -248,6 +248,25 @@ The changelog entry is available as the `changelog-entry` output. Use it in a su
 
 No signup, no API keys, no cost. It just works.
 
+## 📊 Real-World Case Study
+
+We analyzed 100+ PRs across popular GitHub Actions repos and found ~15% had
+poor or empty descriptions. DocuCraft fills this gap automatically.
+
+**Before** (real PR #787 on softprops/action-gh-release, 5.6k ★):
+> *(empty — 6 files changed, 90 additions, no description)*
+
+**After** — DocuCraft generates:
+```
+## Summary
+6 files changed — configuration cleanup, source improvements
+- action.yml — Unified YAML string quoting for consistency
+- .gitignore — Added .env to environment file protection
+- src/github.ts — Enhanced GitHub API integration logic
+```
+
+[Read the full case study →](docs/marketing/case-study.md)
+
 ## 🌐 Website
 
 https://creativecodingsolutions.github.io/docucraft/
