@@ -1,0 +1,20 @@
+name: Suggest a Repo for DocuCraft
+description: Recommend a repository that should use DocuCraft for better PR descriptions
+labels: ["suggestion"]
+body:
+  - type: input
+    id: repo-url
+    attributes:
+      label: Repository URL
+      description: The GitHub repository URL
+      placeholder: https://github.com/owner/repo
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: Why would this repo benefit from DocuCraft?
+      description: Briefly describe the PR quality issue you've noticed
+      placeholder: Many PRs have empty or minimal descriptions...
+    validations:
+      required: false

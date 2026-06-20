@@ -1,0 +1,27 @@
+name: DocuCraft + Changelog
+on:
+  pull_request:
+    types: [opened, synchronize, closed]
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: CreativeCodingSolutions/docucraft@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          generate-changelog: true
+          auto-label: true
+      - name: Update Changelog
+        if: ${{ steps.docucraft.outputs.changelog-entry != '' }}
+        shell: bash
+        run: |
+          echo "${{ steps.docucraft.outputs.changelog-entry }}" >> CHANGELOG.md
+          git config user.name "docucraft"
+          git config user.email "actions@github.com"
+          git add CHANGELOG.md
+          git commit -m "Update changelog [skip ci]"
+          git push
