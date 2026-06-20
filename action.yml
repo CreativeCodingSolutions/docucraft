@@ -449,6 +449,7 @@ runs:
         echo "description<<EOF" >> $GITHUB_OUTPUT
         echo "$DESCRIPTION" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
+        echo "$DESCRIPTION" > /tmp/docucraft_final_desc.txt
 
     - name: Generate description (AI mode)
       id: generate-ai
@@ -478,6 +479,7 @@ runs:
         echo "description<<EOF" >> $GITHUB_OUTPUT
         echo "$DESCRIPTION" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
+        echo "$DESCRIPTION" > /tmp/docucraft_final_desc.txt
 
     - name: Generate changelog entry
       id: changelog
@@ -512,14 +514,11 @@ runs:
           echo "PR #$PR_NUMBER was closed but not merged. Skipping changelog."
         fi
 
-    - name: Collect output description
+    - name: Collect output
       id: set-output
       shell: bash
       run: |
-        DESCRIPTION="${{ steps.generate.outputs.description }}"
-        if [ -z "$DESCRIPTION" ]; then
-          DESCRIPTION="${{ steps.generate-ai.outputs.description }}"
-        fi
+        DESCRIPTION=$(cat /tmp/docucraft_final_desc.txt 2>/dev/null || echo "")
         echo "description<<EOF" >> $GITHUB_OUTPUT
         echo "$DESCRIPTION" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
@@ -531,7 +530,7 @@ runs:
       run: |
         PR_NUMBER="${{ steps.diff.outputs.pr_number }}"
         PR_STATE="${{ github.event.pull_request.state }}"
-        DESCRIPTION="${{ steps.set-output.outputs.description }}"
+        DESCRIPTION=$(cat /tmp/docucraft_final_desc.txt 2>/dev/null || echo "")
         if [ "$PR_STATE" = "open" ] && [ -n "$DESCRIPTION" ]; then
           echo "$DESCRIPTION" | gh pr review $PR_NUMBER --body-file - 2>&1 || true
         fi
