@@ -371,9 +371,7 @@ runs:
         CUSTOM_TEMPLATE_SET=false
 
         if [ -n "${{ inputs.custom-template }}" ]; then
-          cat > /tmp/custom_template.txt << 'DOCUCRAFT_EOF'
-${{ inputs.custom-template }}
-DOCUCRAFT_EOF
+          echo "${{ inputs.custom-template }}" > /tmp/custom_template.txt
           CUSTOM_TEMPLATE_SET=true
         elif [ -n "${{ inputs.custom-template-file }}" ]; then
           TMPL_FILE="$GITHUB_WORKSPACE/${{ inputs.custom-template-file }}"
@@ -396,18 +394,8 @@ DOCUCRAFT_EOF
           sed -i "s|{{summary}}|$SUMMARY|g" /tmp/template_work.txt
           sed -i "s|{{file_count}}|$FILE_COUNT|g" /tmp/template_work.txt
 
-          cat > /tmp/sed_files.sed << 'SEDEOF'
-/{{files}}/{
-r /tmp/template_files.txt
-d
-}
-SEDEOF
-          cat > /tmp/sed_changes.sed << 'SEDEOF'
-/{{changes}}/{
-r /tmp/template_changes.txt
-d
-}
-SEDEOF
+          printf '%s\n' '/{{files}}/{' 'r /tmp/template_files.txt' 'd' '}' > /tmp/sed_files.sed
+          printf '%s\n' '/{{changes}}/{' 'r /tmp/template_changes.txt' 'd' '}' > /tmp/sed_changes.sed
 
           sed -i -f /tmp/sed_files.sed /tmp/template_work.txt
           sed -i -f /tmp/sed_changes.sed /tmp/template_work.txt
