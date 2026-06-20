@@ -29,10 +29,27 @@ inputs:
     required: false
     default: "standard"
 
+  custom-template:
+    description: "Custom markdown template. Supports placeholders: {{summary}}, {{files}}, {{changes}}, {{file_count}}"
+    required: false
+
+  custom-template-file:
+    description: "Path to a file in the repo containing a custom markdown template"
+    required: false
+
+  generate-changelog:
+    description: "When true, generates changelog entries from merged PRs. Requires pull_request event types: [closed]"
+    required: false
+    default: "false"
+
 outputs:
   description:
     description: "The generated PR description"
     value: ${{ steps.generate.outputs.description }}
+
+  changelog-entry:
+    description: "Generated changelog entry (only set when generate-changelog is true and PR is merged)"
+    value: ${{ steps.changelog.outputs.changelog_entry }}
 
 runs:
   using: "composite"
@@ -218,7 +235,53 @@ runs:
           CHANGES_SECTION="${CHANGES_SECTION}"$'\n'
         fi
 
-        if [ "$STYLE" = "minimal" ]; then
+        # --- Custom template support ---
+        CUSTOM_TEMPLATE_SET=false
+
+        if [ -n "${{ inputs.custom-template }}" ]; then
+          cat > /tmp/custom_template.txt << 'DOCUCRAFT_EOF'
+${{ inputs.custom-template }}
+DOCUCRAFT_EOF
+          CUSTOM_TEMPLATE_SET=true
+        elif [ -n "${{ inputs.custom-template-file }}" ]; then
+          TMPL_FILE="$GITHUB_WORKSPACE/${{ inputs.custom-template-file }}"
+          if [ -f "$TMPL_FILE" ]; then
+            cp "$TMPL_FILE" /tmp/custom_template.txt
+            CUSTOM_TEMPLATE_SET=true
+          else
+            echo "::warning title=DocuCraft::Custom template file not found: ${{ inputs.custom-template-file }}"
+          fi
+        fi
+
+        if [ "$CUSTOM_TEMPLATE_SET" = true ] && [ -s /tmp/custom_template.txt ]; then
+          FILES_LIST=$(cat /tmp/pr_files.txt 2>/dev/null || echo "None")
+
+          echo "$FILES_LIST" > /tmp/template_files.txt
+          echo "$CHANGES_SECTION" > /tmp/template_changes.txt
+
+          cp /tmp/custom_template.txt /tmp/template_work.txt
+
+          sed -i "s|{{summary}}|$SUMMARY|g" /tmp/template_work.txt
+          sed -i "s|{{file_count}}|$FILE_COUNT|g" /tmp/template_work.txt
+
+          cat > /tmp/sed_files.sed << 'SEDEOF'
+/{{files}}/{
+r /tmp/template_files.txt
+d
+}
+SEDEOF
+          cat > /tmp/sed_changes.sed << 'SEDEOF'
+/{{changes}}/{
+r /tmp/template_changes.txt
+d
+}
+SEDEOF
+
+          sed -i -f /tmp/sed_files.sed /tmp/template_work.txt
+          sed -i -f /tmp/sed_changes.sed /tmp/template_work.txt
+
+          DESCRIPTION=$(cat /tmp/template_work.txt)
+        elif [ "$STYLE" = "minimal" ]; then
           DESCRIPTION=$(cat <<DESC_EOF
 ## Summary
 
@@ -325,16 +388,54 @@ PROMPT_EOF
         echo "$DESCRIPTION" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
 
+    - name: Generate changelog entry
+      id: changelog
+      shell: bash
+      if: ${{ inputs.generate-changelog == 'true' && github.event.action == 'closed' }}
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        PR_NUMBER="${{ github.event.pull_request.number }}"
+        PR_TITLE="${{ github.event.pull_request.title }}"
+        MERGED="${{ github.event.pull_request.merged }}"
+
+        if [ "$MERGED" = "true" ]; then
+          DATE=$(date +%Y-%m-%d)
+          PR_LABELS=$(gh pr view "$PR_NUMBER" --json labels --jq '[.labels[].name] | join(", ")' 2>/dev/null || echo "")
+          MERGE_COMMIT="${{ github.event.pull_request.merge_commit_sha }}"
+
+          CHANGELOG=$(cat <<CHLOG_EOF
+### [#$PR_NUMBER] - $DATE
+$PR_TITLE
+
+**Labels:** ${PR_LABELS:-none}
+
+**Merge Commit:** $MERGE_COMMIT
+
+**Files:**
+$(cat /tmp/pr_files.txt 2>/dev/null | sed 's/^/- /')
+
+---
+CHLOG_EOF
+)
+          echo "changelog_entry<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        else
+          echo "PR #$PR_NUMBER was closed but not merged. Skipping changelog."
+        fi
+
     - name: Update PR body
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.github-token }}
       run: |
         PR_NUMBER="${{ steps.diff.outputs.pr_number }}"
+        PR_STATE="${{ github.event.pull_request.state }}"
         DESCRIPTION="${{ steps.generate.outputs.description }}"
         if [ -z "$DESCRIPTION" ]; then
           DESCRIPTION="${{ steps.generate-ai.outputs.description }}"
         fi
-        if [ -n "$DESCRIPTION" ]; then
+        if [ "$PR_STATE" = "open" ] && [ -n "$DESCRIPTION" ]; then
           echo "$DESCRIPTION" | gh pr review $PR_NUMBER --body-file - 2>&1 || true
         fi
