@@ -63,8 +63,8 @@ inputs:
 
 outputs:
   description:
-    description: "The generated PR description"
-    value: ${{ steps.generate.outputs.description }}
+    description: "The generated PR description (from template or AI mode)"
+    value: ${{ steps.set-output.outputs.description }}
 
   changelog-entry:
     description: "Generated changelog entry (only set when generate-changelog is true and PR is merged)"
@@ -556,6 +556,18 @@ CHLOG_EOF
           echo "PR #$PR_NUMBER was closed but not merged. Skipping changelog."
         fi
 
+    - name: Collect output description
+      id: set-output
+      shell: bash
+      run: |
+        DESCRIPTION="${{ steps.generate.outputs.description }}"
+        if [ -z "$DESCRIPTION" ]; then
+          DESCRIPTION="${{ steps.generate-ai.outputs.description }}"
+        fi
+        echo "description<<EOF" >> $GITHUB_OUTPUT
+        echo "$DESCRIPTION" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
     - name: Update PR body
       shell: bash
       env:
@@ -563,10 +575,7 @@ CHLOG_EOF
       run: |
         PR_NUMBER="${{ steps.diff.outputs.pr_number }}"
         PR_STATE="${{ github.event.pull_request.state }}"
-        DESCRIPTION="${{ steps.generate.outputs.description }}"
-        if [ -z "$DESCRIPTION" ]; then
-          DESCRIPTION="${{ steps.generate-ai.outputs.description }}"
-        fi
+        DESCRIPTION="${{ steps.set-output.outputs.description }}"
         if [ "$PR_STATE" = "open" ] && [ -n "$DESCRIPTION" ]; then
           echo "$DESCRIPTION" | gh pr review $PR_NUMBER --body-file - 2>&1 || true
         fi

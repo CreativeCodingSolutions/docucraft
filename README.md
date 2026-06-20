@@ -8,7 +8,7 @@ DocuCraft automatically generates structured PR descriptions from your pull requ
 
 ## 🚀 Quick Start
 
-Copy this 5-line workflow into `.github/workflows/docucraft.yml`:
+Copy this workflow into `.github/workflows/docucraft.yml`:
 
 ```yaml
 name: DocuCraft
