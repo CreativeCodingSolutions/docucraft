@@ -77,6 +77,15 @@ Categorizes files into Source Code, Configuration, Tests, Documentation, and Ass
 
 Everything in Standard, plus a diff preview showing the first 3000 characters of the diff — useful for reviewers who want context without switching tabs.
 
+### Summary Only
+
+Just the summary line — file count and change categories. No file list, no categorization. Best for teams that want a quick overview without clutter.
+
+```
+## Summary
+3 files changed — 1 feature, 1 test update, 1 config change
+```
+
 ### Minimal
 
 A clean, simple file list with summary. No categorization, no diff preview. Best for small PRs or teams that prefer brevity.
@@ -147,7 +156,7 @@ Add your OpenAI API key as a repository secret and enable AI mode:
 | `openai-model` | No | `gpt-4o-mini` | OpenAI model name |
 | `mode` | No | `template` | `template` or `ai` |
 | `update-title` | No | `false` | Update PR title too |
-| `template-style` | No | `standard` | `standard`, `detailed`, or `minimal` |
+| `template-style` | No | `standard` | `standard`, `detailed`, `minimal`, or `summary-only` |
 | `custom-template` | No | — | Inline custom markdown template with `{{summary}}`, `{{files}}`, `{{changes}}`, `{{file_count}}` placeholders |
 | `custom-template-file` | No | — | Path to a file in the repo containing a custom markdown template |
 | `generate-changelog` | No | `false` | When `true`, generates changelog entries from merged PRs |
