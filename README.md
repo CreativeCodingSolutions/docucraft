@@ -36,6 +36,7 @@ That's it. Every PR will get a generated description.
 - **AI mode** — optional OpenAI integration for smarter descriptions
 - **Custom templates** — use your own markdown template with placeholder variables
 - **Changelog generation** — auto-generate changelog entries from merged PRs
+- **Auto-labeling** — automatically labels PRs by file type (source, test, docs, config, etc.) and diff size
 - **Works on every PR** — open, synchronize, reopened, closed
 - **No servers** — runs entirely in GitHub Actions
 
@@ -64,6 +65,9 @@ Add your OpenAI API key as a repository secret and enable AI mode:
 | `custom-template` | No | — | Inline custom markdown template with `{{summary}}`, `{{files}}`, `{{changes}}`, `{{file_count}}` placeholders |
 | `custom-template-file` | No | — | Path to a file in the repo containing a custom markdown template |
 | `generate-changelog` | No | `false` | When `true`, generates changelog entries from merged PRs |
+| `auto-label` | No | `false` | When `true`, automatically adds labels based on file types and diff size |
+| `label-prefix` | No | `"` | Optional prefix for auto-generated labels (e.g. `area:` → `area:source`) |
+| `size-labels` | No | `true` | When `auto-label` is true, adds size/xs/s/m/l/xl labels based on diff size |
 
 ## Outputs
 

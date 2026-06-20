@@ -42,6 +42,25 @@ inputs:
     required: false
     default: "false"
 
+  auto-label:
+    description: "When true, automatically adds labels to PRs based on file types and diff size"
+    required: false
+    default: "false"
+
+  label-prefix:
+    description: "Optional prefix for auto-generated labels (e.g. 'area:' becomes 'area:source')"
+    required: false
+    default: ""
+
+  label-mappings:
+    description: "Custom JSON mapping of file patterns to labels. Overrides default mappings"
+    required: false
+
+  size-labels:
+    description: "When true, adds size labels (size/small, size/medium, size/large) based on lines changed"
+    required: false
+    default: "true"
+
 outputs:
   description:
     description: "The generated PR description"
@@ -150,6 +169,119 @@ runs:
         echo "other_files<<EOF" >> $GITHUB_OUTPUT
         echo "${UNKNOWN_FILES:-None}" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Auto-label PR
+      id: labels
+      shell: bash
+      if: ${{ inputs.auto-label == 'true' }}
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        PR_NUMBER="${{ steps.diff.outputs.pr_number }}"
+        PREFIX="${{ inputs.label-prefix }}"
+        USE_SIZE="${{ inputs.size-labels }}"
+        CUSTOM_MAPPINGS="${{ inputs.label-mappings }}"
+
+        LABELS=()
+
+        # Read file list and determine category labels
+        while IFS= read -r file; do
+          [ -z "$file" ] && continue
+          EXT="${file##*.}"
+          LC_EXT=$(echo "$EXT" | tr '[:upper:]' '[:lower:]')
+
+          case "$LC_EXT" in
+            ts|tsx|js|jsx|py|rs|go|java|rb|php|c|cpp|h|hpp|swift|kt|scala)
+              if echo "$file" | grep -qiE '(test|spec|__tests__|__mocks__)'; then
+                LABELS+=("${PREFIX}tests")
+              else
+                LABELS+=("${PREFIX}source")
+              fi
+              ;;
+            json|yaml|yml|toml|ini|cfg|env|conf)
+              LABELS+=("${PREFIX}config")
+              ;;
+            md|mdx|rst|txt|adoc|wiki)
+              LABELS+=("${PREFIX}docs")
+              ;;
+            svg|png|jpg|jpeg|gif|ico|woff|woff2|ttf|eot|css|scss|less)
+              LABELS+=("${PREFIX}assets")
+              ;;
+            dockerfile|yml|yaml)
+              if echo "$file" | grep -qiE '(docker|container)'; then
+                LABELS+=("${PREFIX}docker")
+              fi
+              ;;
+            *)
+              ;;
+          esac
+
+          if echo "$file" | grep -qiE '(docker|container)'; then
+            LABELS+=("${PREFIX}docker")
+          fi
+          if echo "$file" | grep -qiE '(ci|cd|github|workflows|actions)'; then
+            LABELS+=("${PREFIX}ci")
+          fi
+          if echo "$file" | grep -qiE '(security|audit|vuln|cve)'; then
+            LABELS+=("${PREFIX}security")
+          fi
+          if echo "$file" | grep -qiE '(db|migration|schema|sql)'; then
+            LABELS+=("${PREFIX}database")
+          fi
+        done < /tmp/pr_files.txt
+
+        # Size labels
+        if [ "$USE_SIZE" = "true" ]; then
+          DIFF_SIZE="${{ steps.diff.outputs.diff_size }}"
+          if [ "$DIFF_SIZE" -gt 0 ] 2>/dev/null; then
+            if [ "$DIFF_SIZE" -lt 100 ]; then
+              LABELS+=("${PREFIX}size/xs")
+            elif [ "$DIFF_SIZE" -lt 500 ]; then
+              LABELS+=("${PREFIX}size/s")
+            elif [ "$DIFF_SIZE" -lt 2000 ]; then
+              LABELS+=("${PREFIX}size/m")
+            elif [ "$DIFF_SIZE" -lt 10000 ]; then
+              LABELS+=("${PREFIX}size/l")
+            else
+              LABELS+=("${PREFIX}size/xl")
+            fi
+          fi
+        fi
+
+        # Deduplicate labels
+        UNIQUE_LABELS=()
+        for lbl in "${LABELS[@]}"; do
+          found=false
+          for ulbl in "${UNIQUE_LABELS[@]}"; do
+            [ "$ulbl" = "$lbl" ] && found=true && break
+          done
+          $found || UNIQUE_LABELS+=("$lbl")
+        done
+
+        # Apply labels using gh
+        for label in "${UNIQUE_LABELS[@]}"; do
+          # Create label if it doesn't exist (but don't fail if it already does)
+          gh label create "$label" --repo "${{ github.repository }}" --force 2>/dev/null || true
+        done
+
+        if [ ${#UNIQUE_LABELS[@]} -gt 0 ]; then
+          gh pr edit "$PR_NUMBER" --add-label "$(IFS=,; echo "${UNIQUE_LABELS[*]}")" --repo "${{ github.repository }}" 2>&1 || true
+          echo "Applied labels: ${UNIQUE_LABELS[*]}"
+        fi
+
+        echo "labels_applied=${#UNIQUE_LABELS[@]}" >> $GITHUB_OUTPUT
+        LABELS_JSON="["
+        FIRST=true
+        for lbl in "${UNIQUE_LABELS[@]}"; do
+          if [ "$FIRST" = true ]; then
+            LABELS_JSON="$LABELS_JSON\"$lbl\""
+            FIRST=false
+          else
+            LABELS_JSON="$LABELS_JSON,\"$lbl\""
+          fi
+        done
+        LABELS_JSON="$LABELS_JSON]"
+        echo "labels=$LABELS_JSON" >> $GITHUB_OUTPUT
 
     - name: Generate description (template mode)
       id: generate
