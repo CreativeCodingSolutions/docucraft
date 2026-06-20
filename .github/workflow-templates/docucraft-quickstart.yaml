@@ -1,0 +1,16 @@
+name: DocuCraft — Auto PR Descriptions
+description: Automatically generate structured PR descriptions from pull request diffs.
+on:
+  pull_request:
+    types: [opened, synchronize]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: CreativeCodingSolutions/docucraft@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}

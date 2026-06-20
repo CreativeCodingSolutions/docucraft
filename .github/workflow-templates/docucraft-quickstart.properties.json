@@ -1,0 +1,10 @@
+{
+    "name": "DocuCraft — Auto PR Descriptions",
+    "description": "Automatically generate structured PR descriptions from your diffs. Zero config — no API keys needed.",
+    "iconName": "docucraft-icon",
+    "categories": [
+        "GitHub Actions",
+        "Pull Requests",
+        "Automation"
+    ]
+}

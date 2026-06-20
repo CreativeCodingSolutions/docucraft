@@ -1,0 +1,11 @@
+{
+    "name": "DocuCraft — AI Mode",
+    "description": "Generate AI-powered PR descriptions with OpenAI. Smart, semantic descriptions for complex PRs.",
+    "iconName": "docucraft-icon",
+    "categories": [
+        "GitHub Actions",
+        "Pull Requests",
+        "Automation",
+        "AI"
+    ]
+}
