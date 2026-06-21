@@ -143,6 +143,19 @@ jobs:
 - **Works on every PR** — open, synchronize, reopened, closed
 - **No servers** — runs entirely in GitHub Actions
 
+## 📢 Viral Distribution
+
+DocuCraft automatically posts a subtle comment on each newly opened PR with the one-line setup YAML. This turns every processed PR into a distribution channel — anyone viewing the PR sees how easy it is to add DocuCraft to their own repo.
+
+To disable (e.g., for internal repos where you don't want to advertise):
+
+```yaml
+- uses: CreativeCodingSolutions/docucraft@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    viral-comment: false
+```
+
 ## 🤖 AI Mode (Optional)
 
 Add your OpenAI API key as a repository secret and enable AI mode:
@@ -171,6 +184,7 @@ Add your OpenAI API key as a repository secret and enable AI mode:
 | `auto-label` | No | `false` | When `true`, automatically adds labels based on file types and diff size |
 | `label-prefix` | No | `"` | Optional prefix for auto-generated labels (e.g. `area:` → `area:source`) |
 | `size-labels` | No | `true` | When `auto-label` is true, adds size/xs/s/m/l/xl labels based on diff size |
+| `viral-comment` | No | `true` | When `true`, posts a subtle comment on newly opened PRs mentioning DocuCraft with one-line setup — turns every PR into a distribution channel |
 
 ## 📤 Outputs
 
