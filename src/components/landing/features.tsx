@@ -1,33 +1,33 @@
 const features = [
   {
+    title: "One-Click Install",
+    description:
+      "Install the DocuCraft GitHub App with a single click. No YAML files, no workflow setup, no configuration needed.",
+  },
+  {
     title: "Auto PR Descriptions",
     description:
       "Every pull request gets a clear, well-structured description generated from your code changes. No more 'fixed stuff' PRs.",
   },
   {
-    title: "Template Mode (Free)",
+    title: "Zero Config",
     description:
-      "Works out of the box with zero API keys, zero cost, zero config. Generates structured descriptions from your git diff.",
-  },
-  {
-    title: "GitHub Native",
-    description:
-      "Works as a GitHub Action. Add one YAML workflow file and it just works. No servers, no database, no signup.",
+      "Works out of the box with no API keys, no cost, no config. Generates structured descriptions from your git diff instantly.",
   },
   {
     title: "Smart Analysis",
     description:
-      "Understands your codebase context. Generates descriptions that actually explain what changed and why.",
+      "Understands your codebase context. Categorizes files into source, tests, config, docs, and more.",
   },
   {
-    title: "Team Friendly",
+    title: "Viral Distribution",
     description:
-      "Works with your entire team. Every PR gets consistent, high-quality documentation automatically.",
+      "Every PR gets a subtle comment with the DocuCraft badge. Your team members discover it naturally through use.",
   },
   {
     title: "Open Source",
     description:
-      "MIT licensed. Free for public and private repositories. No usage limits, no hidden costs.",
+      "MIT licensed. Free for public and private repositories. No usage limits, no hidden costs. Runs on GitHub infrastructure.",
   },
 ];
 

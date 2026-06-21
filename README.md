@@ -6,15 +6,23 @@
 [![Template](https://img.shields.io/badge/Use-template-2ea44f?style=flat-square&logo=github)](https://github.com/CreativeCodingSolutions/docucraft-demo)
 [![Contributing](https://img.shields.io/badge/contributions-welcome-brightgreen?style=flat-square)](CONTRIBUTING.md)
 
-DocuCraft automatically generates structured PR descriptions from your pull request diffs. Works as a **GitHub Action** — no servers, no database, no configuration needed.
+[![Install GitHub App](https://img.shields.io/badge/Install-GitHub_App-2ea44f?style=flat-square&logo=github)](https://github.com/apps/docucraft)
+
+DocuCraft automatically generates structured PR descriptions from your pull request diffs. Works as a **GitHub App** (one-click install) or **GitHub Action** — no servers, no database, no configuration needed.
 
 ## 🚀 Quick Start
 
-### Option 1: Use the Starter Template
+### Option 1: Install the GitHub App (Recommended)
+
+[![Install DocuCraft](https://img.shields.io/badge/Install-GitHub_App-22c55e?style=for-the-badge&logo=github)](https://github.com/apps/docucraft)
+
+One click → select repos → done. Every PR gets auto-generated descriptions immediately. No YAML, no setup.
+
+### Option 2: Use the Starter Template
 
 Click **[Use this template](https://github.com/CreativeCodingSolutions/docucraft-demo)** → create a repo → open a PR. DocuCraft runs automatically.
 
-### Option 2: Add to an Existing Repo
+### Option 3: Add to an Existing Repo (Action)
 
 Copy this workflow into `.github/workflows/docucraft.yml`:
 
@@ -145,9 +153,21 @@ jobs:
 
 ## 📢 Viral Distribution
 
-DocuCraft automatically posts a subtle comment on each newly opened PR with the one-line setup YAML. This turns every processed PR into a distribution channel — anyone viewing the PR sees how easy it is to add DocuCraft to their own repo.
+DocuCraft automatically posts a subtle comment on each newly opened PR. This turns every processed PR into a distribution channel — anyone viewing the PR sees how easy it is to add DocuCraft to their own repo.
 
-To disable (e.g., for internal repos where you don't want to advertise):
+### README Badge
+
+Show your repo uses DocuCraft. Add this to your `README.md`:
+
+```markdown
+[![PRs by DocuCraft](https://img.shields.io/badge/PRs_by-DocuCraft-22c55e?style=flat-square)](https://github.com/CreativeCodingSolutions/docucraft)
+```
+
+[![PRs by DocuCraft](https://img.shields.io/badge/PRs_by-DocuCraft-22c55e?style=flat-square)](https://github.com/CreativeCodingSolutions/docucraft)
+
+### Disable Viral Comment
+
+For internal repos where you don't want to advertise:
 
 ```yaml
 - uses: CreativeCodingSolutions/docucraft@v1

@@ -1,30 +1,17 @@
 const steps = [
   {
     number: "1",
-    title: "Add the workflow",
+    title: "Install the GitHub App",
     description:
-      "Create a .github/workflows/docucraft.yml file in your repo with this YAML — that's the entire setup.",
-    code: `name: DocuCraft
-on:
-  pull_request:
-    types: [opened, synchronize]
-permissions:
-  contents: read
-  pull-requests: write
-jobs:
-  generate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: CreativeCodingSolutions/docucraft@v1
-        with:
-          github-token: \${{ secrets.GITHUB_TOKEN }}`,
+      "Click 'Install GitHub App' and select the repos you want. That's the entire setup — no YAML, no config, no signup.",
+    code: `# That's it. One click.
+# DocuCraft works on every PR automatically.`,
   },
   {
     number: "2",
     title: "Open a PR",
     description:
-      "Push your code and open a pull request like you normally do. DocuCraft activates automatically.",
+      "Push your code and open a pull request like you normally do. DocuCraft activates automatically on every new PR.",
     code: `git checkout -b feat/add-user-auth
 # make your changes
 git add .
@@ -60,7 +47,7 @@ export function HowItWorks() {
           How it works
         </h2>
         <p className="text-center text-muted-foreground mb-16 max-w-xl mx-auto">
-          One workflow file, zero configuration, instant documentation.
+          Install once. Works on every PR. Zero configuration.
         </p>
         <div className="space-y-24">
           {steps.map((step, i) => (

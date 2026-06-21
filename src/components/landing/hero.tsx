@@ -13,22 +13,22 @@ export function Hero() {
           documentation from your GitHub repositories. Stop writing docs.
           Start shipping.
         </p>
-        <div className="mt-10 flex items-center justify-center gap-4">
+        <div className="mt-10 flex items-center justify-center gap-4 flex-wrap">
           <Link
             href="https://github.com/CreativeCodingSolutions/docucraft"
             className="inline-flex h-12 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            Add to GitHub
+            Install GitHub App
           </Link>
           <Link
-            href="/#features"
+            href="/#how-it-works"
             className="inline-flex h-12 items-center justify-center rounded-md border border-border bg-background px-8 text-sm font-medium hover:bg-accent transition-colors"
           >
-            Learn More
+            How It Works
           </Link>
         </div>
         <p className="mt-4 text-sm text-muted-foreground">
-          Free for open source. $29/mo for Pro.
+          One-click install. Free for open source. Works on every PR.
         </p>
       </div>
     </section>

@@ -21,6 +21,12 @@ export function Header() {
             Pricing
           </Link>
           <Link
+            href="/blog"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Blog
+          </Link>
+          <Link
             href="https://github.com/marketplace/actions/docucraft-pr-description-generator"
             className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >

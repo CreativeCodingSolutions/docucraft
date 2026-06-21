@@ -1,0 +1,16 @@
+{
+  "name": "docucraft",
+  "url": "https://github.com/CreativeCodingSolutions/docucraft",
+  "hook_attributes": {
+    "url": "https://docucraft-webhook.up.railway.app/webhook"
+  },
+  "redirect_url": "https://github.com/CreativeCodingSolutions/docucraft",
+  "public": true,
+  "default_permissions": {
+    "pull_requests": "write",
+    "contents": "read",
+    "metadata": "read"
+  },
+  "default_events": ["pull_request"],
+  "request_oauth_on_install": false
+}
