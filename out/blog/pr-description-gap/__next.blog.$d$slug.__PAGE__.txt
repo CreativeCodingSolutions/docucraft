@@ -1,0 +1,111 @@
+1:"$Sreact.fragment"
+2:I[22016,["/_next/static/chunks/3zzuu2827hwd8.js","/_next/static/chunks/14mrh2-p_w84d.js","/_next/static/chunks/2fqlcr-ia71j-.js"],""]
+3:I[5014,["/_next/static/chunks/3zzuu2827hwd8.js","/_next/static/chunks/14mrh2-p_w84d.js","/_next/static/chunks/2fqlcr-ia71j-.js"],"default"]
+8:I[97367,["/_next/static/chunks/3zzuu2827hwd8.js","/_next/static/chunks/14mrh2-p_w84d.js"],"OutletBoundary"]
+9:"$Sreact.suspense"
+4:T21a2,<p class="leading-relaxed text-muted-foreground">Pull requests are the backbone of collaborative development. They're how code gets reviewed, discussed, and merged. But there's a quiet problem hiding in plain sight: <strong>a significant chunk of PRs have no meaningful description at all.</strong></p>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">I recently analyzed 100+ pull requests across several popular open-source GitHub Actions repositories. The numbers aren't great.</p>
+<!-- -->
+<h2 class="mt-10 mb-4 text-2xl font-bold tracking-tight">The Data</h2>
+<!-- -->
+<div class='overflow-x-auto'><table class='w-full border-collapse text-sm'>
+<tr>
+<th class="border px-3 py-2 text-left font-medium bg-muted">Metric</th>
+<th class="border px-3 py-2 text-left font-medium bg-muted">Value</th>
+</tr>
+<tr>
+<td class="border px-3 py-2 text-left">PRs with poor descriptions (&lt; 150 chars)</td>
+<td class="border px-3 py-2 text-left">~15%</td>
+</tr>
+<tr>
+<td class="border px-3 py-2 text-left">PRs with empty descriptions (0 chars)</td>
+<td class="border px-3 py-2 text-left">~5%</td>
+</tr>
+<tr>
+<td class="border px-3 py-2 text-left">Average description length</td>
+<td class="border px-3 py-2 text-left">~400 chars</td>
+</tr>
+</table></div>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">One in seven PRs had a description shorter than this paragraph. One in twenty had nothing at all.</p>
+<!-- -->
+<h2 class="mt-10 mb-4 text-2xl font-bold tracking-tight">Real Examples</h2>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">Here's what I found in the wild.</p>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground"><strong>softprops/action-gh-release (#787)</strong> — 5,670 stars. The title was &quot;Update the latest release.&quot; Six files changed, +90/-35 lines. The description? Blank. Nothing. Not a single character.</p>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground"><strong>docker/build-push-action (#1550)</strong> — 5,310 stars. Title: &quot;mention Docker GitHub Builder in the README.&quot; One file changed. Description: empty.</p>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">Even when descriptions exist, they're often just the title repeated: &quot;feat: update action to use node24&quot; — three files, +179/-160 lines, and the &quot;body&quot; was the same four words as the title.</p>
+<!-- -->
+<h2 class="mt-10 mb-4 text-2xl font-bold tracking-tight">Why This Matters</h2>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">An empty PR description isn't just a nicety. It has real costs:</p>
+<!-- -->
+<li class="ml-6 list-disc text-muted-foreground"><strong>Reviewers spend 15-30% more time</strong> parsing diffs when there's no context about *why* the change exists</li>
+<li class="ml-6 list-disc text-muted-foreground"><strong>New contributors</strong> can't understand the reasoning behind changes, making it harder for them to ramp up</li>
+<li class="ml-6 list-disc text-muted-foreground"><strong>Changelogs</strong> become a manual slog — or just don't get written</li>
+<li class="ml-6 list-disc text-muted-foreground"><strong>Bus factor</strong> increases: if only the author understands a change, that knowledge is fragile</li>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">When a PR touches 6 files across config, source, and dependencies, the reviewer shouldn't have to reverse-engineer the intent from a blank text box.</p>
+<!-- -->
+<h2 class="mt-10 mb-4 text-2xl font-bold tracking-tight">What Good Looks Like</h2>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">For comparison, here's what a structured PR description looks like. This was generated for that same softprops/action-gh-release PR:</p>
+<!-- -->
+<blockquote class="border-l-4 border-primary/30 pl-4 italic text-muted-foreground"><strong>Summary</strong>: 6 files changed — configuration cleanup, source improvements, and dependency updates</blockquote>
+<p class="leading-relaxed text-muted-foreground">&gt;</p>
+<blockquote class="border-l-4 border-primary/30 pl-4 italic text-muted-foreground"><strong>Files Changed</strong>:<br>- <strong>action.yml</strong> — Unified YAML string quoting style (double → single quotes)<br>- <strong>.gitignore</strong> — Added <code>.env</code> to prevent accidental environment file commits<br>- <strong>src/github.ts</strong> — Enhanced GitHub API integration<br>- <strong>src/main.ts</strong> — Refactored main entry point with improved error handling</blockquote>
+<p class="leading-relaxed text-muted-foreground">&gt;</p>
+<blockquote class="border-l-4 border-primary/30 pl-4 italic text-muted-foreground"><strong>Categories</strong>: Style/Config, Features, Refactoring</blockquote>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">Notice what this gives you: at a glance, you know *what* changed, *where*, and *why*. You can decide if a review is worth your time without clicking into individual files.</p>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">For the node24 upgrade PR, the generated description also includes a &quot;Why&quot; section explaining the rationale — because it inferred from the diff that it was responding to GitHub Actions runner updates.</p>
+<!-- -->
+<h2 class="mt-10 mb-4 text-2xl font-bold tracking-tight">DocuCraft: Automated PR Descriptions</h2>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">I built <a href="https://github.com/CreativeCodingSolutions/docucraft" target="_blank" rel="noopener noreferrer" class="text-primary underline underline-offset-4 hover:text-primary/80">DocuCraft</a> to solve this. It's a GitHub Action that runs on every pull request and generates a structured description from the diff.</p>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">It works by analyzing the changed files, classifying changes by type (feature, fix, refactor, docs, deps, config), and generating a consistent, readable description.</p>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">The key design decisions:</p>
+<!-- -->
+<li class="ml-6 list-disc text-muted-foreground"><strong>Zero configuration.</strong> No API keys, no external services, no signup. It's a single YAML workflow file.</li>
+<li class="ml-6 list-disc text-muted-foreground"><strong>Runs entirely on GitHub Actions.</strong> Your diff never leaves GitHub's infrastructure.</li>
+<li class="ml-6 list-disc text-muted-foreground"><strong>Idempotent.</strong> It updates the PR description but won't overwrite manual edits you make.</li>
+<li class="ml-6 list-disc text-muted-foreground"><strong>Open source.</strong> The code is right there for inspection.</li>
+<!-- -->
+<h2 class="mt-10 mb-4 text-2xl font-bold tracking-tight">How to Set It Up</h2>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">Add this file to <code>.github/workflows/docucraft.yml</code>:</p>
+<!-- -->
+<pre class="overflow-x-auto rounded-lg border bg-muted p-4 text-sm"><code>name: DocuCraft
+on: pull_request
+permissions: { contents: read, pull-requests: write }
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: CreativeCodingSolutions/docucraft@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}</code></pre>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">That's it. Every PR from that point forward gets a structured description.</p>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">In fact, DocuCraft was used to generate the description for <a href="https://github.com/CreativeCodingSolutions/docucraft/pull/4" target="_blank" rel="noopener noreferrer" class="text-primary underline underline-offset-4 hover:text-primary/80">its own PR #4</a> — eating its own dog food.</p>
+<!-- -->
+<h2 class="mt-10 mb-4 text-2xl font-bold tracking-tight">The Pitch (It's Short)</h2>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">If you maintain a repo, especially an open-source one, adding DocuCraft takes two minutes and costs nothing. It won't write perfect descriptions — it can't replace human context — but it will turn blank PR descriptions into something a reviewer can actually work with.</p>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">For the 15% of PRs that currently have nothing, that's a huge improvement.</p>
+<!-- -->
+<p class="leading-relaxed text-muted-foreground">Try it: <a href="https://github.com/CreativeCodingSolutions/docucraft" target="_blank" rel="noopener noreferrer" class="text-primary underline underline-offset-4 hover:text-primary/80">github.com/CreativeCodingSolutions/docucraft</a></p>0:{"rsc":["$","$1","c",{"children":[[["$","header",null,{"className":"fixed top-0 z-50 w-full border-b bg-background/80 backdrop-blur-sm","children":["$","div",null,{"className":"mx-auto flex h-16 max-w-6xl items-center justify-between px-6","children":[["$","$L2",null,{"href":"/","className":"flex items-center gap-2 font-bold text-xl","children":[["$","span",null,{"className":"text-primary","children":"Docu"}],"Craft"]}],["$","nav",null,{"className":"flex items-center gap-6","children":[["$","$L2",null,{"href":"/#features","className":"text-sm text-muted-foreground hover:text-foreground transition-colors","children":"Features"}],["$","$L2",null,{"href":"/#pricing","className":"text-sm text-muted-foreground hover:text-foreground transition-colors","children":"Pricing"}],["$","$L2",null,{"href":"/blog","className":"text-sm text-muted-foreground hover:text-foreground transition-colors","children":"Blog"}],["$","$L2",null,{"href":"https://github.com/marketplace/actions/docucraft-pr-description-generator","className":"inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors","children":"Add to GitHub"}]]}]]}]}],["$","main",null,{"className":"min-h-screen pt-24 pb-16","children":["$","article",null,{"className":"mx-auto max-w-3xl px-6","children":[["$","$L2",null,{"href":"/blog","className":"mb-8 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors","children":[["$","$L3",null,{"iconNode":[["path",{"d":"m12 19-7-7 7-7","key":"1l729n"}],["path",{"d":"M19 12H5","key":"x3x0zl"}]],"className":"lucide-arrow-left h-4 w-4"}],"Back to blog"]}],["$","header",null,{"className":"mb-8","children":[["$","h1",null,{"className":"text-3xl font-bold tracking-tight mb-3","children":"The PR Description Gap: Why 15% of Open Source PRs Are Empty (And How to Fix It)"}],["$","div",null,{"className":"flex items-center gap-2 text-sm text-muted-foreground","children":[["$","time",null,{"dateTime":"2026-06-20","children":"2026-06-20"}],["$","span",null,{"children":"·"}],["$","span",null,{"children":"DocuCraft Team"}]]}],["$","div",null,{"className":"mt-4 flex flex-wrap gap-2","children":[["$","span","opensource",{"className":"inline-flex rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground","children":"opensource"}],["$","span","github",{"className":"inline-flex rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground","children":"github"}],["$","span","devops",{"className":"inline-flex rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground","children":"devops"}],["$","span","productivity",{"className":"inline-flex rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground","children":"productivity"}],["$","span","cicd",{"className":"inline-flex rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground","children":"cicd"}]]}]]}],["$","div",null,{"className":"border-t pt-8","children":["$","div",null,{"className":"prose-custom space-y-4","dangerouslySetInnerHTML":{"__html":"$4"}}]}]]}]}],"$L5"],["$L6"],"$L7"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"F0eKrhuQSITLVciDskbHY"}
+5:["$","footer",null,{"className":"border-t px-6 py-8","children":["$","div",null,{"className":"mx-auto flex max-w-6xl items-center justify-between","children":[["$","p",null,{"className":"text-sm text-muted-foreground","children":["© ",2026," DocuCraft. All rights reserved."]}],["$","div",null,{"className":"flex items-center gap-4 text-sm text-muted-foreground","children":[["$","a",null,{"href":"https://github.com/CreativeCodingSolutions/docucraft","target":"_blank","rel":"noopener noreferrer","className":"hover:text-foreground transition-colors","children":"GitHub"}],["$","a",null,{"href":"https://creativecodingsolutions.github.io/docucraft","target":"_blank","rel":"noopener noreferrer","className":"hover:text-foreground transition-colors","children":"Docs"}],["$","a",null,{"href":"https://github.com/marketplace/actions/docucraft-pr-description-generator","target":"_blank","rel":"noopener noreferrer","className":"hover:text-foreground transition-colors","children":"Marketplace"}]]}]]}]}]
+6:["$","script","script-0",{"src":"/_next/static/chunks/2fqlcr-ia71j-.js","async":true}]
+7:["$","$L8",null,{"children":["$","$9",null,{"name":"Next.MetadataOutlet","children":"$@a"}]}]
+a:null

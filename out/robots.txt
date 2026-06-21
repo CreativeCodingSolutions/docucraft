@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://creativecodingsolutions.github.io/docucraft/sitemap.xml
